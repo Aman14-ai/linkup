@@ -13,6 +13,7 @@ import { useMutationState } from "@/hooks/useMutationState";
 import { toast } from "sonner";
 import CommentBox from "./CommentBox";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 type Event = {
   _id: Id<"events">;
@@ -38,6 +39,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     api.comment.getCommentsByEvent,
     event ? { eventId: event._id } : "skip"
   );
+  const currentLoggedInUser = useQuery(api.user.getCurrentUser);
 
   const [commentString, setCommentString] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +77,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     try {
       const data = {
         eventId: event._id,
-        userId: user?._id,
+        userId: currentLoggedInUser?._id as Id<"users">,
         content: commentString,
       };
       await createComment(data);

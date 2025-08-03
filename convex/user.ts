@@ -25,11 +25,25 @@ export const get = query({
 });
 
 export const getBy_id = query({
-  args:{id:v.id("users")},
-  handler:async(ctx,args) => {
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
     return await ctx.db.get(args.id);
+  },
+});
+
+export const getCurrentUser = query(async (ctx) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new Error("Not authenticated");
   }
-})
+
+  const user = await ctx.db
+    .query("users")
+    .filter((q) => q.eq(q.field("clerkId"), identity.subject)) // `subject` is Clerk user ID
+    .first();
+
+  return user;
+});
 
 // UPDATE or CREATE user (UPSERT)
 export const updateOrCreate = internalMutation({
