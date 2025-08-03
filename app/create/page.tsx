@@ -57,6 +57,7 @@ const CreatePage = () => {
 
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
@@ -73,7 +74,7 @@ const CreatePage = () => {
   const handleCreateEvent = async (formData: FormData) => {
     setIsLoading(true);
     try {
-      const data = formData
+      const data = formData;
       if (!userData?._id) {
         toast.error("User not found. Please log in.");
         return;
@@ -83,7 +84,17 @@ const CreatePage = () => {
         ...data,
         creatorId: userData._id,
       };
-      await createRequest(fullData); // fullData now includes creatorId
+      await createRequest(fullData);
+
+      // Reset the form after successful creation
+      reset({
+        title: "",
+        description: "",
+        location: "",
+        date: "",
+        category: "",
+        imageUrl: "",
+      });
 
       toast.success("Event created successfully!");
     } catch (error) {
@@ -95,7 +106,7 @@ const CreatePage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="min-h-screen bg-blue-50">
