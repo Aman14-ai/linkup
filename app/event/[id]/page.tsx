@@ -4,7 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { CalendarDays, MapPin, User, ArrowLeft, Clock, Share2, Heart } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import React, { use, useState } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useMutationState } from "@/hooks/useMutationState";
 import { toast } from "sonner";
 import CommentBox from "./CommentBox";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 type Event = {
   _id: Id<"events">;
@@ -30,6 +30,8 @@ type Event = {
 
 const Page = ({ params }: { params: { id: string } }) => {
   const { id } = React.use(params);
+  const {isSignedIn} = useAuth();
+  if(!isSignedIn) redirect("/sign-in")
   const event = useQuery(api.event.getEventById, { id: id as Id<"events"> });
   const user = useQuery(
     api.user.getBy_id,
